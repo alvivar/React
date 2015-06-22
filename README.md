@@ -3,4 +3,5 @@ behaviour.
 
 *Experimental, unstable, use it at your own risk.*
 
-By [Andrés Villalobos](http://twitter.com/matnesis).
+—
+[Andrés Villalobos](http://twitter.com/matnesis).
