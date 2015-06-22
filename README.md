@@ -1,7 +1,7 @@
-*Experimental, unstable, use it at your own risk.*
+*Experimental, unstable, undocumented, use it at your own risk.*
 
-React is a work-in-progress undocumented Unity component for simple AI
+React is a *work-in-progress* Unity component for simple AI
 behaviour.
 
 
-*[Andrés Villalobos](http://twitter.com/matnesis)*
+**[Andrés Villalobos](http://twitter.com/matnesis)**
