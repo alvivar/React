@@ -75,7 +75,7 @@ public class React : MonoBehaviour
 			{
 				r.Stop();
 
-				break;
+				continue;
 			}
 
 
