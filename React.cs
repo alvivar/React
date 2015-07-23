@@ -79,10 +79,6 @@ public class React : MonoBehaviour
 			}
 
 
-			// Tick
-			yield return new WaitForSeconds(tick);
-
-
 			// Evaluation
 			if (r.Condition())
 			{
@@ -92,6 +88,10 @@ public class React : MonoBehaviour
 				// No more evaluations until the next execution
 				stopTheRest = true;
 			}
+
+
+			// Tick
+			yield return new WaitForSeconds(tick);
 		}
 
 
