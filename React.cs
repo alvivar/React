@@ -10,6 +10,10 @@ using UnityEngine;
 
 public class React : MonoBehaviour
 {
+	[Header("Info")]
+	public string currentReaction = "";
+	public string lastReactionExecuted = "";
+
 	[Header("ReactBase Queue")]
 	public List<ReactBase> linear;
 	public List<ReactBase> untilCondition;
@@ -70,11 +74,14 @@ public class React : MonoBehaviour
 
 		foreach (ReactBase r in untilCondition)
 		{
+			// +Info
+			currentReaction = r.GetType().Name;
+
+
 			// Stop all reactions only
 			if (stopTheRest)
 			{
 				r.Stop();
-
 				continue;
 			}
 
@@ -82,11 +89,20 @@ public class React : MonoBehaviour
 			// Evaluation
 			if (r.Condition())
 			{
+				// +Info
+				lastReactionExecuted = r.GetType().Name;
+
 				// Execution
 				yield return StartCoroutine(r.Action());
 
 				// No more evaluations until the next execution
 				stopTheRest = true;
+			}
+			else
+			{
+				// To avoid leftovers when the last action executed is the
+				// current else condition #experimental
+				r.Stop();
 			}
 
 
