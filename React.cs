@@ -10,61 +10,41 @@ using UnityEngine;
 
 public class React : MonoBehaviour
 {
-	[Header("Info")]
-	public string currentReaction = "";
-	public string lastReactionExecuted = "";
+	[Header("Config")]
+	public float tick = 0.1f; // Time to rest between ReactBase components evaluation
 
 	[Header("ReactBase Queue")]
-	public List<ReactBase> linear;
-	public List<ReactBase> untilCondition;
+	public List<ReactBase> untilCondition; // Main queue to evaluate
 
-	[Header("Config")]
-	public bool autoStart = true;
-	public float tick = 0.1f;
+	[Header("Info")]
+	public string currentReaction = ""; // ReactBase component currently evaluated
+	public string lastReactionExecuted = ""; // Last ReactBase executed (Condition == true)
 
-	private Coroutine coLinearExecution;
-	private Coroutine coUntilConditionExecution;
+	private Coroutine coUntilConditionExecution; // Main coroutine
 
 
 	void Start()
 	{
-		if (autoStart)
-			Play();
+		StartCoroutine(Play());
 	}
 
 
-	public void Play()
+	public IEnumerator Play()
 	{
-		Stop();
+		// Waiting for Start
+		yield return new WaitForEndOfFrame();
 
-		coLinearExecution = StartCoroutine(ExecuteLinear());
+		// Restart
+		Stop();
 		coUntilConditionExecution = StartCoroutine(ExecuteUntilCondition());
 	}
 
 
 	public void Stop()
 	{
-		if (coLinearExecution != null)
-			StopCoroutine(coLinearExecution);
-
+		// Stops the main coroutine
 		if (coUntilConditionExecution != null)
 			StopCoroutine(coUntilConditionExecution);
-	}
-
-
-	IEnumerator ExecuteLinear()
-	{
-		foreach (ReactBase r in linear)
-		{
-			yield return new WaitForSeconds(tick);
-
-			if (r.Condition())
-				yield return StartCoroutine(r.Action());
-		}
-
-		yield return null;
-
-		StartCoroutine(ExecuteLinear());
 	}
 
 
@@ -72,13 +52,14 @@ public class React : MonoBehaviour
 	{
 		bool stopTheRest = false;
 
+
 		foreach (ReactBase r in untilCondition)
 		{
-			// +Info
+			// +Debug info
 			currentReaction = r.GetType().Name;
 
 
-			// Stop all reactions only
+			// Stop all reactions "mode"
 			if (stopTheRest)
 			{
 				r.Stop();
@@ -89,30 +70,30 @@ public class React : MonoBehaviour
 			// Evaluation
 			if (r.Condition())
 			{
-				// +Info
+				// +Debug info
 				lastReactionExecuted = r.GetType().Name;
 
-				// Execution
+				// Coroutine execution
 				yield return StartCoroutine(r.Action());
 
-				// No more evaluations until the next execution
+				// Flag to stop evaluations the rest of evaluations
 				stopTheRest = true;
 			}
 			else
 			{
 				// To avoid leftovers when the last action executed is the
-				// current else condition #experimental
+				// current reaction to evaluate
 				r.Stop();
 			}
 
 
-			// Tick
+			// Rest time between evaluation
 			yield return new WaitForSeconds(tick);
 		}
 
 
 		// Wait and retry
 		yield return new WaitForEndOfFrame();
-		StartCoroutine(ExecuteUntilCondition());
+		coUntilConditionExecution = StartCoroutine(ExecuteUntilCondition());
 	}
 }
