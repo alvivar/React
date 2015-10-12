@@ -1,5 +1,5 @@
 ﻿
-// Andrés Villalobos | andresalvivar@gmail.com | @matnesis
+// Andrés Villalobos ^ andresalvivar@gmail.com ^ @matnesis
 // 2015/06/17 01:44:37 PM
 
 
@@ -76,7 +76,7 @@ public class React : MonoBehaviour
 				// Coroutine execution
 				yield return StartCoroutine(r.Action());
 
-				// Flag to stop evaluations the rest of evaluations
+				// Flag to stop the rest of evaluations
 				stopTheRest = true;
 			}
 			else
