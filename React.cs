@@ -1,5 +1,7 @@
 ﻿
-// Andrés Villalobos ^ andresalvivar@gmail.com ^ @matnesis
+// Queue-like workflow for simple AI systems. ReactBase compatible.
+
+// @matnesis
 // 2015/06/17 01:44:37 PM
 
 
@@ -10,6 +12,9 @@ using UnityEngine;
 
 public class React : MonoBehaviour
 {
+	[Header("Shared Data")]
+	public Transform target;
+
 	[Header("Config")]
 	public float tick = 0.1f; // Time to rest between ReactBase components evaluation
 
