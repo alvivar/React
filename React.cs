@@ -11,93 +11,97 @@ using UnityEngine;
 
 public class React : MonoBehaviour
 {
-	[Header("Shared Data")]
-	public Transform target;
+    [Header("Shared Data")]
+    public Transform target;
 
-	[Header("Config")]
-	public float tick = 0.1f; // Time to rest between ReactBase components evaluation
+    [Header("Config")]
+    public float tick = 0.1f; // Time to rest between ReactBase components evaluation
 
-	[Header("ReactBase Queue")]
-	public List<ReactBase> untilCondition; // Main queue to evaluate
+    [Header("ReactBase Queue")]
+    public List<ReactBase> untilCondition; // Main queue to evaluate
 
-	[Header("Info")]
-	public string currentReaction = ""; // ReactBase component currently evaluated
-	public string lastReactionExecuted = ""; // Last ReactBase executed (Condition == true)
+    [Header("Info")]
+    public string currentReaction = ""; // ReactBase component currently evaluated
+    public string lastReactionExecuted = ""; // Last ReactBase executed (Condition == true)
 
-	private Coroutine coUntilConditionExecution; // Main coroutine
-
-
-	void Start()
-	{
-		StartCoroutine(Play());
-	}
+    private Coroutine coUntilConditionExecution; // Main coroutine
 
 
-	public IEnumerator Play()
-	{
-		// Waiting for Start
-		yield return new WaitForEndOfFrame();
-
-		// Restart
-		Stop();
-		coUntilConditionExecution = StartCoroutine(ExecuteUntilCondition());
-	}
+    public void Start()
+    {
+        StartCoroutine(Play());
+    }
 
 
-	public void Stop()
-	{
-		// Stops the main coroutine
-		if (coUntilConditionExecution != null)
-			StopCoroutine(coUntilConditionExecution);
-	}
+    IEnumerator Play()
+    {
+        // Waiting for Start
+        yield return new WaitForEndOfFrame();
+
+        // Restart
+        Stop();
+        coUntilConditionExecution = StartCoroutine(ExecuteUntilCondition());
+    }
 
 
-	IEnumerator ExecuteUntilCondition()
-	{
-		bool stopTheRest = false;
+    public void Stop()
+    {
+        // Stops the main coroutine
+        if (coUntilConditionExecution != null)
+            StopCoroutine(coUntilConditionExecution);
+
+        // Stops everything
+        foreach (ReactBase r in untilCondition)
+            r.Stop();
+    }
 
 
-		foreach (ReactBase r in untilCondition)
-		{
-			// +Debug info
-			currentReaction = r.GetType().Name;
+    IEnumerator ExecuteUntilCondition()
+    {
+        bool stopTheRest = false;
 
 
-			// Stop all reactions "mode"
-			if (stopTheRest)
-			{
-				r.Stop();
-				continue;
-			}
+        foreach (ReactBase r in untilCondition)
+        {
+            // +Debug info
+            currentReaction = r.GetType().Name;
 
 
-			// Evaluation
-			if (r.Condition())
-			{
-				// +Debug info
-				lastReactionExecuted = r.GetType().Name;
-
-				// Coroutine execution
-				yield return StartCoroutine(r.Action());
-
-				// Flag to stop the rest of evaluations
-				stopTheRest = true;
-			}
-			else
-			{
-				// To avoid leftovers when the last action executed is the
-				// current reaction to evaluate
-				r.Stop();
-			}
+            // Stop all reactions "mode"
+            if (stopTheRest)
+            {
+                r.Stop();
+                continue;
+            }
 
 
-			// Rest time between evaluation
-			yield return new WaitForSeconds(tick);
-		}
+            // Evaluation
+            if (r.Condition())
+            {
+                // +Debug info
+                lastReactionExecuted = r.GetType().Name;
+
+                // Coroutine execution
+                yield return StartCoroutine(r.Action());
+
+                // Flag to stop the rest of evaluations
+                stopTheRest = true;
+            }
+            else
+            {
+                // To avoid leftovers when the last action executed is the
+                // current reaction to evaluate
+                r.Stop();
+            }
 
 
-		// Wait and retry
-		yield return new WaitForEndOfFrame();
-		coUntilConditionExecution = StartCoroutine(ExecuteUntilCondition());
-	}
+            // Rest time between evaluation
+            yield return new WaitForSeconds(tick);
+        }
+
+
+        // Wait and retry
+        yield return new WaitForEndOfFrame();
+        coUntilConditionExecution = StartCoroutine(ExecuteUntilCondition());
+    }
 }
